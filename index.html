@@ -601,20 +601,31 @@
         
         // Función para manejar la respuesta de autenticación
         function handleCredentialResponse(response) {
-        try {
-            // Parsea directamente el JWT sin decodificar
-            const payload = JSON.parse(atob(response.credential.split('.')[1]));
+            // Decodificar el token JWT para obtener información del usuario
+            const base64Url = response.credential.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent (atob(base64).split('').map(c => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            })).join('');
             
-            // Envía el token al backend para verificación
-            fetch('/api/auth/google', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ token: response.credential })
-            });
+            user = JSON.parse(jsonPayload);
             
-        } catch (error) {
-            console.error('Error processing credential:', error);
-        }
+            // Actualizar UI
+            userName.textContent = user.name;
+            userEmail.textContent = user.email;
+            userAvatar.textContent = user.name.charAt(0).toUpperCase();
+            userInfo.classList.remove('hidden');
+            
+            // Obtener token de acceso
+            accessToken = response.access_token;
+            
+            // Mostrar secciones de datos y envío
+            authSection.classList.add('hidden');
+            dataSection.classList.remove('hidden');
+            sendSection.classList.remove('hidden');
+            
+            // Cargar datos de Google Sheets
+            loadSheetData();
         }
         
         // Cerrar sesión
