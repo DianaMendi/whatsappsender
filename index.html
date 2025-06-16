@@ -368,13 +368,13 @@
                         <textarea id="seguimiento-message" class="form-control" rows="4">Hola, ¿cómo estás? Solo quería seguir en contacto contigo. ¿Hay algo en lo que pueda ayudarte?</textarea>
                     </div>
                     
-                    <button class="btn-send">
+                    <button class="btn-send" id="btnSeguimiento">
                         <i class="fab fa-whatsapp"></i> Enviar Mensaje de Seguimiento
                     </button>
                     
                     <div class="status-section">
                         <h3><i class="fas fa-history"></i> Historial de Seguimiento:</h3>
-                        <table class="data-table">
+                        <table class="data-table" id="seguimiento-table">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
@@ -384,24 +384,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>María López</td>
-                                    <td>+51987654321</td>
-                                    <td>Seguimiento de compra</td>
-                                    <td>15/06/2023</td>
-                                </tr>
-                                <tr>
-                                    <td>Carlos Ruiz</td>
-                                    <td>+51912345678</td>
-                                    <td>Recordatorio de pago</td>
-                                    <td>14/06/2023</td>
-                                </tr>
-                                <tr>
-                                    <td>Ana Torres</td>
-                                    <td>+51987651234</td>
-                                    <td>Satisfacción con servicio</td>
-                                    <td>12/06/2023</td>
-                                </tr>
+                                <!-- Datos se cargarán desde Google Sheets -->
                             </tbody>
                         </table>
                     </div>
@@ -421,13 +404,13 @@
                         <textarea id="cliente-message" class="form-control" rows="4">Hola, tenemos una oferta especial que creemos que te podría interesar. ¿Te gustaría conocer más detalles?</textarea>
                     </div>
                     
-                    <button class="btn-send">
+                    <button class="btn-send" id="btnClientes">
                         <i class="fab fa-whatsapp"></i> Enviar Mensaje a Cliente
                     </button>
                     
                     <div class="status-section">
                         <h3><i class="fas fa-address-book"></i> Lista de Clientes:</h3>
-                        <table class="data-table">
+                        <table class="data-table" id="clientes-table">
                             <thead>
                                 <tr>
                                     <th>Nombre</th>
@@ -437,36 +420,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>Juan Pérez</td>
-                                    <td>+51987654321</td>
-                                    <td>Producto A</td>
-                                    <td>
-                                        <button class="btn-send" style="padding: 5px 10px; font-size: 14px;">
-                                            <i class="fab fa-whatsapp"></i> Enviar
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Laura Gómez</td>
-                                    <td>+51912345678</td>
-                                    <td>Servicio B</td>
-                                    <td>
-                                        <button class="btn-send" style="padding: 5px 10px; font-size: 14px;">
-                                            <i class="fab fa-whatsapp"></i> Enviar
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Roberto Sánchez</td>
-                                    <td>+51987651234</td>
-                                    <td>Producto C</td>
-                                    <td>
-                                        <button class="btn-send" style="padding: 5px 10px; font-size: 14px;">
-                                            <i class="fab fa-whatsapp"></i> Enviar
-                                        </button>
-                                    </td>
-                                </tr>
+                                <!-- Datos se cargarán desde Google Sheets -->
                             </tbody>
                         </table>
                     </div>
@@ -525,6 +479,8 @@
         const authorizeButton = document.getElementById('authorize_button');
         const signoutButton = document.getElementById('signout_button');
         const sendBtn = document.getElementById('sendBtn');
+        const btnSeguimiento = document.getElementById('btnSeguimiento');
+        const btnClientes = document.getElementById('btnClientes');
         
         // Actualizar estado inicial
         updateUI();
@@ -656,7 +612,7 @@
         }
         
         /**
-         * Carga datos de ejemplo de una hoja de cálculo
+         * Carga datos de la hoja de cálculo
          */
         async function loadSheetData() {
             let response;
@@ -677,9 +633,25 @@
                 
                 // Formatear datos para mostrar
                 contentEl.textContent = 'Datos cargados correctamente!\n\n';
-                range.values.slice(0, 10).forEach(row => {
-                    contentEl.textContent += `- ${row[0]}: ${row[1]}\n`;
-                });
+                
+                // Procesar datos para la tabla de seguimiento
+                const seguimientoTable = document.querySelector('#seguimiento-table tbody');
+                seguimientoTable.innerHTML = '';
+                
+                // Saltar la primera fila (encabezados)
+                for (let i = 1; i < range.values.length; i++) {
+                    const row = range.values[i];
+                    const tr = document.createElement('tr');
+                    
+                    // Asegurarse de que haya suficientes columnas
+                    for (let j = 0; j < 4; j++) {
+                        const td = document.createElement('td');
+                        td.textContent = row[j] || '';
+                        tr.appendChild(td);
+                    }
+                    
+                    seguimientoTable.appendChild(tr);
+                }
                 
             } catch (err) {
                 contentEl.textContent = 'Error: ' + err.message;
@@ -689,10 +661,7 @@
         /**
          * Envía mensaje por WhatsApp
          */
-        function sendWhatsAppMessage() {
-            const phone = document.getElementById('direct-phone').value.trim();
-            const message = document.getElementById('direct-message').value.trim();
-            
+        function sendWhatsAppMessage(phone, message) {
             if (!phone) {
                 contentEl.textContent = 'Error: Por favor ingresa un número de teléfono.';
                 return;
@@ -717,7 +686,23 @@
         // Asignar manejadores de eventos
         authorizeButton.onclick = handleAuthClick;
         signoutButton.onclick = handleSignoutClick;
-        sendBtn.onclick = sendWhatsAppMessage;
+        sendBtn.onclick = () => {
+            const phone = document.getElementById('direct-phone').value.trim();
+            const message = document.getElementById('direct-message').value.trim();
+            sendWhatsAppMessage(phone, message);
+        };
+        
+        btnSeguimiento.onclick = () => {
+            const phone = document.getElementById('seguimiento-phone').value.trim();
+            const message = document.getElementById('seguimiento-message').value.trim();
+            sendWhatsAppMessage(phone, message);
+        };
+        
+        btnClientes.onclick = () => {
+            const phone = document.getElementById('cliente-phone').value.trim();
+            const message = document.getElementById('cliente-message').value.trim();
+            sendWhatsAppMessage(phone, message);
+        };
         
         // Inicializar Google APIs
         document.addEventListener('DOMContentLoaded', () => {
