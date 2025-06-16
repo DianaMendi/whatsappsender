@@ -18,11 +18,13 @@ let tokenClient;
 let gapiInited = false;
 let gisInited = false;
 
+document.getElementById("gapi").addEventListener("load",gapiLoaded());
+document.getElementById("gis").addEventListener("load",gisInited());
+
 document.getElementById('authorize_button').style.visibility = 'hidden';
 document.getElementById('signout_button').style.visibility = 'hidden';
 
-document.getElementById("gapi").addEventListener("load",gapiLoaded());
-document.getElementById("gis").addEventListener("load",gisInited());
+
 
 /**
  * Callback after api.js is loaded.
