@@ -118,17 +118,19 @@ async function listMajors() {
             range: 'SEGUIMIENTO!A:G',
         });
     } catch (err) {
-        document.getElementById('content').innerText = err.message;
+        console.error(err)
         return;
     }
     const range = response.result;
     if (!range || !range.values || range.values.length == 0) {
-        document.getElementById('content').innerText = 'No values found.';
+        console.warn("No se encontraron valores")
         return;
     }
+
+    console.log(range.values)
     // Flatten to string to display
-    const output = range.values.reduce(
-        (str, row) => `${str}${row[0]}, ${row[4]}\n`,
-        'Name, Major:\n');
-    document.getElementById('content').innerText = output;
+//    const output = range.values.reduce(
+  //      (str, row) => `${str}${row[0]}, ${row[4]}\n`,
+    //    'Name, Major:\n');
+    //document.getElementById('content').innerText = output;
 }
