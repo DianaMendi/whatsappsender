@@ -1,21 +1,734 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Sheets API Quickstart</title>
-    <meta charset="utf-8" />
-  </head>
-  <body>
-    <p>Sheets API Quickstart</p>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Sender</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #128C7E);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #25D366, #128C7E);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .user-info {
+            background: #075E54;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .auth-section {
+            padding: 25px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .auth-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+        }
+        
+        #authorize_button {
+            background: #4285F4;
+            color: white;
+        }
+        
+        #signout_button {
+            background: #EA4335;
+            color: white;
+        }
+        
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 400px;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: #f1f8e9;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+        
+        .nav-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #128C7E;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: left;
+            padding-left: 20px;
+        }
+        
+        .nav-button:hover {
+            background: #075E54;
+            transform: translateX(5px);
+        }
+        
+        .nav-button.active {
+            background: #075E54;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-button i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .content-area {
+            flex: 1;
+            padding: 25px;
+        }
+        
+        .content-section {
+            display: none;
+        }
+        
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 16px;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: #25D366;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 211, 102, 0.2);
+        }
+        
+        .btn-send {
+            background: #25D366;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-send:hover {
+            background: #128C7E;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .data-table th {
+            background: #128C7E;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        
+        .data-table tr:nth-child(even) {
+            background-color: #f5f5f5;
+        }
+        
+        .data-table tr:hover {
+            background-color: #e1f5fe;
+        }
+        
+        .data-table td {
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .status-section {
+            padding: 15px;
+            background: #f1f8e9;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 4px solid #7CB342;
+        }
+        
+        .status-section h3 {
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 18px;
+        }
+        
+        #content {
+            white-space: pre-wrap;
+            font-family: monospace;
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            max-height: 200px;
+            overflow-y: auto;
+            font-size: 14px;
+        }
+        
+        footer {
+            background: #f5f5f5;
+            padding: 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .contact-info {
+            margin-top: 10px;
+            font-weight: 500;
+        }
+        
+        .contact-info a {
+            color: #128C7E;
+            text-decoration: none;
+        }
+        
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+            }
+            
+            .auth-button {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fab fa-whatsapp"></i> WhatsApp Sender</h1>
+            <p>Envía mensajes directamente a tus clientes</p>
+        </header>
+        
+        <div class="user-info">
+            <span id="userStatus">No autenticado</span>
+            <span id="userEmail"></span>
+        </div>
+        
+        <div class="auth-section">
+            <h2>Autenticación con Google</h2>
+            <p>Conecta tu cuenta de Google para acceder a los datos de tus clientes</p>
+            
+            <div class="auth-buttons">
+                <button id="authorize_button" class="auth-button">
+                    <i class="fab fa-google"></i> Autorizar con Google
+                </button>
+                <button id="signout_button" class="auth-button">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+                </button>
+            </div>
+        </div>
+        
+        <div class="app-container">
+            <div class="sidebar">
+                <button class="nav-button active" data-section="seguimiento">
+                    <i class="fas fa-list-check"></i> Mensajes de Seguimiento
+                </button>
+                <button class="nav-button" data-section="clientes">
+                    <i class="fas fa-users"></i> Mensajes a Clientes
+                </button>
+                <button class="nav-button" data-section="enviar">
+                    <i class="fas fa-paper-plane"></i> Enviar Mensaje Directo
+                </button>
+            </div>
+            
+            <div class="content-area">
+                <div id="seguimiento" class="content-section active">
+                    <h2><i class="fas fa-list-check"></i> Mensajes de Seguimiento</h2>
+                    <p>Envía mensajes automatizados de seguimiento a tus clientes</p>
+                    
+                    <div class="form-group">
+                        <label for="seguimiento-phone"><i class="fas fa-phone"></i> Número de teléfono:</label>
+                        <input type="text" id="seguimiento-phone" class="form-control" placeholder="Ej: +51960621504">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="seguimiento-message"><i class="fas fa-comment"></i> Mensaje de seguimiento:</label>
+                        <textarea id="seguimiento-message" class="form-control" rows="4">Hola, ¿cómo estás? Solo quería seguir en contacto contigo. ¿Hay algo en lo que pueda ayudarte?</textarea>
+                    </div>
+                    
+                    <button class="btn-send">
+                        <i class="fab fa-whatsapp"></i> Enviar Mensaje de Seguimiento
+                    </button>
+                    
+                    <div class="status-section">
+                        <h3><i class="fas fa-history"></i> Historial de Seguimiento:</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Teléfono</th>
+                                    <th>Último mensaje</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>María López</td>
+                                    <td>+51987654321</td>
+                                    <td>Seguimiento de compra</td>
+                                    <td>15/06/2023</td>
+                                </tr>
+                                <tr>
+                                    <td>Carlos Ruiz</td>
+                                    <td>+51912345678</td>
+                                    <td>Recordatorio de pago</td>
+                                    <td>14/06/2023</td>
+                                </tr>
+                                <tr>
+                                    <td>Ana Torres</td>
+                                    <td>+51987651234</td>
+                                    <td>Satisfacción con servicio</td>
+                                    <td>12/06/2023</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="clientes" class="content-section">
+                    <h2><i class="fas fa-users"></i> Mensajes a Clientes</h2>
+                    <p>Envía mensajes personalizados a tus clientes</p>
+                    
+                    <div class="form-group">
+                        <label for="cliente-phone"><i class="fas fa-phone"></i> Número de teléfono:</label>
+                        <input type="text" id="cliente-phone" class="form-control" placeholder="Ej: +51960621504">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cliente-message"><i class="fas fa-comment"></i> Mensaje personalizado:</label>
+                        <textarea id="cliente-message" class="form-control" rows="4">Hola, tenemos una oferta especial que creemos que te podría interesar. ¿Te gustaría conocer más detalles?</textarea>
+                    </div>
+                    
+                    <button class="btn-send">
+                        <i class="fab fa-whatsapp"></i> Enviar Mensaje a Cliente
+                    </button>
+                    
+                    <div class="status-section">
+                        <h3><i class="fas fa-address-book"></i> Lista de Clientes:</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Teléfono</th>
+                                    <th>Última compra</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Juan Pérez</td>
+                                    <td>+51987654321</td>
+                                    <td>Producto A</td>
+                                    <td>
+                                        <button class="btn-send" style="padding: 5px 10px; font-size: 14px;">
+                                            <i class="fab fa-whatsapp"></i> Enviar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Laura Gómez</td>
+                                    <td>+51912345678</td>
+                                    <td>Servicio B</td>
+                                    <td>
+                                        <button class="btn-send" style="padding: 5px 10px; font-size: 14px;">
+                                            <i class="fab fa-whatsapp"></i> Enviar
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Roberto Sánchez</td>
+                                    <td>+51987651234</td>
+                                    <td>Producto C</td>
+                                    <td>
+                                        <button class="btn-send" style="padding: 5px 10px; font-size: 14px;">
+                                            <i class="fab fa-whatsapp"></i> Enviar
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div id="enviar" class="content-section">
+                    <h2><i class="fas fa-paper-plane"></i> Enviar Mensaje Directo</h2>
+                    <p>Envía un mensaje personalizado directamente a un número de WhatsApp</p>
+                    
+                    <div class="form-group">
+                        <label for="direct-phone"><i class="fas fa-phone"></i> Número de teléfono (con código de país):</label>
+                        <input type="text" id="direct-phone" class="form-control" placeholder="Ej: +51960621504">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="direct-message"><i class="fas fa-comment"></i> Mensaje:</label>
+                        <textarea id="direct-message" class="form-control" rows="4" placeholder="Escribe tu mensaje aquí"></textarea>
+                    </div>
+                    
+                    <button id="sendBtn" class="btn-send">
+                        <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
+                    </button>
+                    
+                    <div class="status-section">
+                        <h3><i class="fas fa-info-circle"></i> Estado de la aplicación:</h3>
+                        <pre id="content"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Sistema desarrollado para Diana Mendi © 2023</p>
+            <div class="contact-info">
+                <a href="mailto:contacto@dianamendi.com"><i class="fas fa-envelope"></i> contacto@dianamendi.com</a> | 
+                <a href="tel:+51960621504"><i class="fas fa-phone"></i> +51 960 621 504</a>
+            </div>
+        </footer>
+    </div>
 
-    <!--Autenticacion-->
-    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
-    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
-
-    <!--<pre id="content" style="white-space: pre-wrap;"></pre> SACAMOS ESTO PORQUE ERA DE ESAS PALASBRAS, LISTAS QUE ESTABA SALIENDO ABAJO-->
-
-    <script async defer src="https://apis.google.com/js/api.js" id="gapi"></script>
-    <script async defer src="https://accounts.google.com/gsi/client" id="gis"></script>
-    <script async defer src="app.js"></script>
-
-  </body>
+    <script>
+        // Configuración de Google Sheets
+        const CLIENT_ID = '789346406829-cmq7673mllfrs1gobnis4ble0vb9uv2f.apps.googleusercontent.com';
+        const API_KEY = 'AIzaSyDwcvUuJ0B61U-5NKxSPufM39Pvl3cDdQc';
+        const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+        const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
+        
+        let tokenClient;
+        let gapiInited = false;
+        let gisInited = false;
+        
+        // Elementos del DOM
+        const contentEl = document.getElementById('content');
+        const userStatusEl = document.getElementById('userStatus');
+        const userEmailEl = document.getElementById('userEmail');
+        const authorizeButton = document.getElementById('authorize_button');
+        const signoutButton = document.getElementById('signout_button');
+        const sendBtn = document.getElementById('sendBtn');
+        
+        // Actualizar estado inicial
+        updateUI();
+        
+        // Navegación entre secciones
+        const navButtons = document.querySelectorAll('.nav-button');
+        const contentSections = document.querySelectorAll('.content-section');
+        
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remover clase activa de todos los botones
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                
+                // Añadir clase activa al botón clickeado
+                button.classList.add('active');
+                
+                // Ocultar todas las secciones
+                contentSections.forEach(section => section.classList.remove('active'));
+                
+                // Mostrar la sección correspondiente
+                const sectionId = button.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+        
+        /**
+         * Callback después de cargar api.js
+         */
+        function gapiLoaded() {
+            gapi.load('client', initializeGapiClient);
+        }
+        
+        /**
+         * Callback después de cargar el cliente API
+         */
+        async function initializeGapiClient() {
+            await gapi.client.init({
+                apiKey: API_KEY,
+                discoveryDocs: [DISCOVERY_DOC],
+            });
+            gapiInited = true;
+            maybeEnableButtons();
+        }
+        
+        /**
+         * Callback después de cargar Google Identity Services
+         */
+        function gisLoaded() {
+            tokenClient = google.accounts.oauth2.initTokenClient({
+                client_id: CLIENT_ID,
+                scope: SCOPES,
+                callback: '', // definido más adelante
+            });
+            gisInited = true;
+            maybeEnableButtons();
+        }
+        
+        /**
+         * Habilita la interacción del usuario después de cargar las librerías
+         */
+        function maybeEnableButtons() {
+            if (gapiInited && gisInited) {
+                authorizeButton.style.display = 'block';
+            }
+        }
+        
+        /**
+         * Maneja el clic en el botón Autorizar
+         */
+        function handleAuthClick() {
+            tokenClient.callback = async (resp) => {
+                if (resp.error !== undefined) {
+                    throw (resp);
+                }
+                
+                // Actualizar UI
+                signoutButton.style.display = 'block';
+                authorizeButton.textContent = 'Actualizar';
+                
+                // Mostrar información del usuario
+                const token = gapi.client.getToken();
+                if (token) {
+                    const payload = JSON.parse(atob(token.access_token.split('.')[1]));
+                    userStatusEl.textContent = 'Autenticado';
+                    userEmailEl.textContent = payload.email || 'Usuario Google';
+                }
+                
+                // Cargar datos de la hoja de cálculo
+                await loadSheetData();
+            };
+            
+            if (gapi.client.getToken() === null) {
+                // Solicitar consentimiento para una nueva sesión
+                tokenClient.requestAccessToken({ prompt: 'consent' });
+            } else {
+                // Usar sesión existente
+                tokenClient.requestAccessToken({ prompt: '' });
+            }
+        }
+        
+        /**
+         * Maneja el clic en el botón Cerrar sesión
+         */
+        function handleSignoutClick() {
+            const token = gapi.client.getToken();
+            if (token !== null) {
+                google.accounts.oauth2.revoke(token.access_token);
+                gapi.client.setToken('');
+                updateUI();
+            }
+        }
+        
+        /**
+         * Actualiza la interfaz de usuario según el estado de autenticación
+         */
+        function updateUI() {
+            if (gapi.client.getToken() !== null) {
+                signoutButton.style.display = 'block';
+                authorizeButton.textContent = 'Actualizar';
+                userStatusEl.textContent = 'Autenticado';
+            } else {
+                signoutButton.style.display = 'none';
+                authorizeButton.textContent = 'Autorizar con Google';
+                authorizeButton.style.display = 'block';
+                userStatusEl.textContent = 'No autenticado';
+                userEmailEl.textContent = '';
+                contentEl.textContent = 'Por favor autoriza con Google para continuar';
+            }
+        }
+        
+        /**
+         * Carga datos de ejemplo de una hoja de cálculo
+         */
+        async function loadSheetData() {
+            let response;
+            try {
+                contentEl.textContent = 'Cargando datos de la hoja de cálculo...';
+                
+                // Obtener datos de la hoja de cálculo
+                response = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: '1USL95W4CYBvGOIpvBLlcO-3djRTRjJer2DbkCl48vpQ',
+                    range: 'SEGUIMIENTO!A:G',
+                });
+                
+                const range = response.result;
+                if (!range || !range.values || range.values.length === 0) {
+                    contentEl.textContent = 'No se encontraron datos en la hoja.';
+                    return;
+                }
+                
+                // Formatear datos para mostrar
+                contentEl.textContent = 'Datos cargados correctamente!\n\n';
+                range.values.slice(0, 10).forEach(row => {
+                    contentEl.textContent += `- ${row[0]}: ${row[1]}\n`;
+                });
+                
+            } catch (err) {
+                contentEl.textContent = 'Error: ' + err.message;
+            }
+        }
+        
+        /**
+         * Envía mensaje por WhatsApp
+         */
+        function sendWhatsAppMessage() {
+            const phone = document.getElementById('direct-phone').value.trim();
+            const message = document.getElementById('direct-message').value.trim();
+            
+            if (!phone) {
+                contentEl.textContent = 'Error: Por favor ingresa un número de teléfono.';
+                return;
+            }
+            
+            if (!message) {
+                contentEl.textContent = 'Error: Por favor ingresa un mensaje.';
+                return;
+            }
+            
+            // Formatear el mensaje para URL
+            const encodedMessage = encodeURIComponent(message);
+            const waUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+            
+            // Abrir en una nueva pestaña
+            window.open(waUrl, '_blank');
+            
+            // Mostrar mensaje de éxito
+            contentEl.textContent = `Mensaje enviado a ${phone} correctamente!`;
+        }
+        
+        // Asignar manejadores de eventos
+        authorizeButton.onclick = handleAuthClick;
+        signoutButton.onclick = handleSignoutClick;
+        sendBtn.onclick = sendWhatsAppMessage;
+        
+        // Inicializar Google APIs
+        document.addEventListener('DOMContentLoaded', () => {
+            // Simular carga de scripts
+            setTimeout(() => {
+                gapiLoaded();
+                gisLoaded();
+            }, 1000);
+        });
+    </script>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+</body>
 </html>
