@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WhatsApp Sender - Diana Mendi</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -406,7 +407,7 @@
                 </div>
                 
                 <div id="g_id_onload"
-                    data-client_id="296147933621-bs5oennkjfo2t4ah3egil102fheefb94.apps.googleusercontent.com"
+                    data-client_id="789346406829-cmq7673mllfrs1gobnis4ble0vb9uv2f.apps.googleusercontent.com"
                     data-context="signin"
                     data-ux_mode="popup"
                     data-callback="handleCredentialResponse"
@@ -606,7 +607,7 @@
             const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
             const jsonPayload = decodeURIComponent (atob(base64).split('').map(c => {
                 return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            })).join('');
+            }).join('');
             
             user = JSON.parse(jsonPayload);
             
