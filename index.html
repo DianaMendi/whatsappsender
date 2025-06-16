@@ -3,943 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp Sender - Diana Mendi</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
+    <title>WhatsApp Sender</title>
     <style>
-        :root {
-            --primary: #25D366;
-            --secondary: #128C7E;
-            --light: #f0f9f8;
-            --dark: #075E54;
-            --accent: #34B7F1;
-            --gray: #f5f5f5;
-            --dark-gray: #e0e0e0;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
         body {
-            background: linear-gradient(135deg, #f0f9ff, #e6f7ff);
-            color: #333;
-            line-height: 1.6;
+            font-family: Arial, sans-serif;
+            margin: 0;
             padding: 20px;
-            min-height: 100vh;
+            background-color: #f5f5f5;
         }
-        
         .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-        }
-        
-        header {
-            background: linear-gradient(135deg, var(--secondary), var(--dark));
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        header::before {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
             max-width: 800px;
             margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .sheet-id {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 15px;
-            border-radius: 20px;
-            margin-top: 15px;
-            display: inline-block;
-            font-size: 0.9rem;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .content {
-            padding: 30px;
-        }
-        
-        .section {
-            background: var(--gray);
-            border-radius: 12px;
-            padding: 25px;
-            margin-bottom: 30px;
-            border-left: 4px solid var(--accent);
-        }
-        
-        .section-title {
-            color: var(--dark);
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.4rem;
-        }
-        
-        .section-title i {
-            font-size: 1.8rem;
-            color: var(--accent);
-        }
-        
-        .hidden {
-            display: none;
-        }
-        
-        .btn {
-            display: inline-block;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            text-align: center;
-            margin: 10px 5px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .btn:hover {
-            background: var(--secondary);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-        }
-        
-        .btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .btn-secondary {
             background: white;
-            color: var(--dark);
-            border: 2px solid var(--primary);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--light);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #555;
-        }
-        
-        input[type="text"],
-        input[type="time"],
-        input[type="date"],
-        textarea {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
+            padding: 20px;
             border-radius: 8px;
-            font-size: 1rem;
-            transition: border-color 0.3s;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
-        input[type="text"]:focus,
-        textarea:focus {
-            border-color: var(--primary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.2);
-        }
-        
-        .progress-container {
-            background: #f0f0f0;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 25px 0;
-            height: 25px;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary), var(--secondary));
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-        
-        .stats {
+        .header {
             display: flex;
             justify-content: space-between;
-            margin-top: 10px;
-            font-weight: 500;
-        }
-        
-        .status-box {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 20px;
-            min-height: 60px;
-            border-left: 4px solid var(--primary);
-        }
-        
-        .tabs {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 15px;
-            background: var(--dark-gray);
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            min-width: 150px;
-        }
-        
-        .tab.active {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        
-        .data-table th {
-            background: var(--secondary);
-            color: white;
-            padding: 12px;
-            text-align: left;
-        }
-        
-        .data-table td {
-            padding: 10px 12px;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
             border-bottom: 1px solid #eee;
-            font-size: 0.9rem;
         }
-        
-        .data-table tr:nth-child(even) {
-            background: var(--light);
-        }
-        
-        .data-table tr:hover {
-            background: #e0f7fa;
-        }
-        
         .user-info {
-            background: var(--light);
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 10px;
         }
-        
-        .avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: var(--secondary);
+        .logout-btn {
+            background: #f44336;
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #loginSection {
+            text-align: center;
+            padding: 40px 0;
+        }
+        #appContent {
+            display: none; /* Inicialmente oculto hasta autenticar */
+        }
+        #extension-warning {
+            display: none;
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 20px;
+        }
+        /* Estilos para la sección de envío de mensajes */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
             font-weight: bold;
         }
-        
-        .user-details h3 {
-            color: var(--dark);
-            margin-bottom: 5px;
-        }
-        
-        .info-box {
-            background: #e8f0fe;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid var(--primary);
-        }
-        
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top: 4px solid var(--primary);
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .success-badge {
-            background: #e8f5e9;
-            color: #2e7d32;
-            padding: 3px 8px;
+        input, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
             border-radius: 4px;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
         }
-        
-        .error-badge {
-            background: #ffebee;
-            color: #c62828;
-            padding: 3px 8px;
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
             border-radius: 4px;
-            font-size: 0.8rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                margin: 20px;
-            }
-            
-            header {
-                padding: 20px 15px;
-            }
-            
-            .content {
-                padding: 20px 15px;
-            }
-            
-            .tabs {
-                flex-direction: column;
-            }
-            
-            .tab {
-                min-width: 100%;
-            }
-            
-            .data-table {
-                font-size: 0.8rem;
-            }
-            
-            .data-table td, .data-table th {
-                padding: 8px 10px;
-            }
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1><i class="fab fa-whatsapp"></i> WhatsApp Sender</h1>
-            <p class="subtitle">Envía mensajes masivos desde Google Sheets a WhatsApp</p>
-            <div class="sheet-id">
-                <i class="fas fa-table"></i> ID de Hoja: 1USL95W4CYBvGOIpvBLlcO-3djRTRjJer2DbkCl48vpQ
-            </div>
-        </header>
-        
-        <div class="content">
-            <!-- Sección de autenticación -->
-            <div class="section" id="authSection">
-                <h2 class="section-title">
-                    <i class="fas fa-sign-in-alt"></i> Autenticación
-                </h2>
-                
-                <div class="info-box">
-                    <p>Necesitas iniciar sesión con Google para acceder a tus datos de Google Sheets.</p>
-                </div>
-                
-                <div id="g_id_onload"
-                    data-client_id="789346406829-cmq7673mllfrs1gobnis4ble0vb9uv2f.apps.googleusercontent.com"
-                    data-context="signin"
-                    data-ux_mode="popup"
-                    data-callback="handleCredentialResponse"
-                    data-auto_prompt="false">
-                </div>
-                
-                <div class="g_id_signin"
-                    data-type="standard"
-                    data-shape="rectangular"
-                    data-theme="filled_blue"
-                    data-text="signin_with"
-                    data-size="large"
-                    data-logo_alignment="left"
-                    data-width="300">
-                </div>
-                
-                <div class="user-info hidden" id="userInfo">
-                    <div class="avatar" id="userAvatar">U</div>
-                    <div class="user-details">
-                        <h3 id="userName">Usuario</h3>
-                        <p id="userEmail">usuario@ejemplo.com</p>
-                    </div>
-                    <button class="btn btn-secondary" id="signoutButton">Cerrar sesión</button>
-                </div>
-            </div>
-            
-            <!-- Sección de datos (oculta inicialmente) -->
-            <div class="section hidden" id="dataSection">
-                <h2 class="section-title">
-                    <i class="fas fa-database"></i> Datos de Google Sheets
-                </h2>
-                
-                <div class="tabs">
-                    <div class="tab active" data-tab="clientes">Clientes</div>
-                    <div class="tab" data-tab="seguimiento">Seguimiento</div>
-                    <div class="tab" data-tab="mensajes">Mensajes</div>
-                </div>
-                
-                <div class="tab-content active" id="clientesContent">
-                    <div class="status-box" id="clientesStatus">
-                        Cargando datos de clientes...
-                        <div class="spinner"></div>
-                    </div>
-                    <table class="data-table hidden" id="clientesTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Teléfono</th>
-                                <th>Departamento</th>
-                                <th>Tipo</th>
-                            </tr>
-                        </thead>
-                        <tbody id="clientesBody"></tbody>
-                    </table>
-                </div>
-                
-                <div class="tab-content" id="seguimientoContent">
-                    <div class="status-box" id="seguimientoStatus">
-                        Cargando datos de seguimiento...
-                        <div class="spinner"></div>
-                    </div>
-                    <table class="data-table hidden" id="seguimientoTable">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Teléfono</th>
-                                <th>Ocasión</th>
-                                <th>Días</th>
-                            </tr>
-                        </thead>
-                        <tbody id="seguimientoBody"></tbody>
-                    </table>
-                </div>
-                
-                <div class="tab-content" id="mensajesContent">
-                    <div class="status-box" id="mensajesStatus">
-                        Cargando plantillas de mensajes...
-                        <div class="spinner"></div>
-                    </div>
-                    <table class="data-table hidden" id="mensajesTable">
-                        <thead>
-                            <tr>
-                                <th>Días</th>
-                                <th>Mensaje Casual</th>
-                                <th>Mensaje Negocio</th>
-                            </tr>
-                        </thead>
-                        <tbody id="mensajesBody"></tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <!-- Sección de envío de mensajes -->
-            <div class="section hidden" id="sendSection">
-                <h2 class="section-title">
-                    <i class="fas fa-paper-plane"></i> Enviar Mensajes
-                </h2>
-                
-                <div class="tabs">
-                    <div class="tab active" data-tab="now">Enviar ahora</div>
-                    <div class="tab" data-tab="schedule">Programar</div>
-                    <div class="tab" data-tab="follow">Seguimiento</div>
-                </div>
-                
-                <div class="tab-content active" id="nowContent">
-                    <div class="form-group">
-                        <label for="mensajeInput">Mensaje:</label>
-                        <textarea id="mensajeInput" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
-                    </div>
-                    
-                    <button class="btn" id="btnSendNow">Enviar ahora a clientes</button>
-                </div>
-                
-                <div class="tab-content" id="scheduleContent">
-                    <div class="form-group">
-                        <label for="mensajeInputSchedule">Mensaje:</label>
-                        <textarea id="mensajeInputSchedule" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="scheduleDate">Fecha de envío:</label>
-                        <input type="date" id="scheduleDate">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="scheduleTime">Hora de envío:</label>
-                        <input type="time" id="scheduleTime">
-                    </div>
-                    
-                    <button class="btn" id="btnSchedule">Programar envío</button>
-                </div>
-                
-                <div class="tab-content" id="followContent">
-                    <div class="info-box">
-                        <p>Los mensajes de seguimiento se enviarán automáticamente según la ocasión y los días configurados en la hoja de seguimiento.</p>
-                    </div>
-                    
-                    <button class="btn" id="btnSendFollow">Enviar seguimiento</button>
-                </div>
-                
-                <div class="progress-container">
-                    <div class="progress-bar" id="progressBar"></div>
-                </div>
-                
-                <div class="stats">
-                    <div id="counter">0/0 enviados</div>
-                    <div id="timer">Tiempo restante: --:--</div>
-                </div>
-                
-                <div class="status-box" id="sendStatus">
-                    Preparado para comenzar...
-                </div>
+        <div class="header">
+            <h1>WhatsApp Sender</h1>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <span id="userEmail"></span>
+                <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
             </div>
         </div>
-        
-        <div class="section" style="background: #f8f9fa; border-radius: 0; text-align: center; padding: 20px;">
-            <p>Sistema desarrollado para Diana Mendi &copy; 2023</p>
-            <p><i class="fas fa-envelope"></i> contacto@dianamendi.com | <i class="fas fa-phone"></i> +51 960 621 504</p>
+
+        <!-- Sección de Login -->
+        <div id="loginSection">
+            <h2>Autenticación</h2>
+            <p>Necesitas iniciar sesión con Google para continuar</p>
+            <div id="googleSignIn"></div>
+            <div id="errorMessage" style="color: red; margin: 15px 0; display: none;">
+                Error en autenticación. Intenta nuevamente.
+            </div>
+            <div id="extension-warning">
+                <strong>¡Advertencia!</strong> Parece que tienes extensiones que bloquean Google Login. 
+                Por favor intenta en modo incógnito o desactiva AdBlock/Privacy extensions.
+            </div>
         </div>
+
+        <!-- Sección de la Aplicación (oculta inicialmente) -->
+        <div id="appContent">
+            <h2>Enviar mensaje por WhatsApp</h2>
+            <div class="form-group">
+                <label for="phone">Número de teléfono (con código de país):</label>
+                <input type="text" id="phone" placeholder="Ej: +51960621504">
+            </div>
+            <div class="form-group">
+                <label for="message">Mensaje:</label>
+                <textarea id="message" rows="4" placeholder="Escribe tu mensaje aquí"></textarea>
+            </div>
+            <button id="sendBtn">Enviar por WhatsApp</button>
+        </div>
+
+        <footer style="margin-top: 30px; text-align: center;">
+            <p>Sistema desarrollado para Diana Mendi © 2023<br>
+            contacto@dianamendi.com | +51 960 621 504</p>
+        </footer>
     </div>
 
+    <!-- Cargamos Google Identity Services de forma dinámica -->
     <script>
-        // TUS CREDENCIALES
-        const CLIENT_ID = '789346406829-cmq7673mllfrs1gobnis4ble0vb9uv2f.apps.googleusercontent.com';
-        const SHEET_ID = '1USL95W4CYBvGOIpvBLlcO-3djRTRjJer2DbkCl48vpQ';  // TU SHEET ID
-        
-        // Variables globales
-        let accessToken;
-        let user = null;
-        let sheetData = {
-            seguimiento: [],
-            clientes: [],
-            mensajes: {}
-        };
-        let currentSending = null;
-        
-        // Elementos DOM
-        const authSection = document.getElementById ('authSection');
-        const dataSection = document.getElementById('dataSection');
-        const sendSection = document.getElementById('sendSection');
+        // 1. Elementos del DOM
+        const loginSection = document.getElementById('loginSection');
+        const appContent = document.getElementById('appContent');
         const userInfo = document.getElementById('userInfo');
-        const userAvatar = document.getElementById('userAvatar');
-        const userName = document.getElementById('userName');
         const userEmail = document.getElementById('userEmail');
-        const signoutButton = document.getElementById('signoutButton');
-        const progressBar = document.getElementById('progressBar');
-        const counter = document.getElementById('counter');
-        const timer = document.getElementById('timer');
-        const sendStatus = document.getElementById('sendStatus');
-        
-        // Función para manejar la respuesta de autenticación
-        function handleCredentialResponse(response) {
-            // Decodificar el token JWT para obtener información del usuario
-            const base64Url = response.credential.split('.')[1];
-            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            const jsonPayload = decodeURIComponent (atob(base64).split('').map(c => {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join('');
-            
-            user = JSON.parse(jsonPayload);
-            
-            // Actualizar UI
-            userName.textContent = user.name;
-            userEmail.textContent = user.email;
-            userAvatar.textContent = user.name.charAt(0).toUpperCase();
-            userInfo.classList.remove('hidden');
-            
-            // Obtener token de acceso
-            accessToken = response.access_token;
-            
-            // Mostrar secciones de datos y envío
-            authSection.classList.add('hidden');
-            dataSection.classList.remove('hidden');
-            sendSection.classList.remove('hidden');
-            
-            // Cargar datos de Google Sheets
-            loadSheetData();
-        }
-        
-        // Cerrar sesión
-        signoutButton.addEventListener('click', () => {
-            window.google.accounts.id.disableAutoSelect();
-            user = null;
-            userInfo.classList.add('hidden');
-            authSection.classList.remove('hidden');
-            dataSection.classList.add('hidden');
-            sendSection.classList.add('hidden');
-        });
-        
-        // Cambiar pestañas de datos
-        document.querySelectorAll('.tab[data-tab]').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-                
-                // Actualizar pestañas activas
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Mostrar contenido correspondiente
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.getElementById(`${tabName}Content`).classList.add('active');
-            });
-        });
-        
-        // Cambiar pestañas de envío
-        document.querySelectorAll('.tab[data-tab]').forEach(tab => {
-            tab.addEventListener('click', () => {
-                const tabName = tab.getAttribute('data-tab');
-                
-                // Actualizar pestañas activas
-                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                
-                // Mostrar contenido correspondiente
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.remove('active');
-                });
-                document.getElementById(`${tabName}Content`).classList.add('active');
-            });
-        });
-        
-        // Cargar datos de Google Sheets
-        async function loadSheetData() {
+        const logoutBtn = document.getElementById('logoutBtn');
+        const googleSignIn = document.getElementById('googleSignIn');
+        const errorMessage = document.getElementById('errorMessage');
+        const extensionWarning = document.getElementById('extension-warning');
+
+        // 2. Función para decodificar el token JWT
+        function parseJwt(token) {
             try {
-                // Cargar datos de clientes
-                const clientesResponse = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/MENSAJE_DIARIO!A:F`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    }
-                );
-                
-                const clientesData = await clientesResponse.json();
-                sheetData.clientes = processSheetData(clientesData.values);
-                renderClientesTable();
-                
-                // Cargar datos de seguimiento
-                const seguimientoResponse = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/SEGUIMIENTO!A:G`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    }
-                );
-                
-                const seguimientoData = await seguimientoResponse.json();
-                sheetData.seguimiento = processSheetData(seguimientoData.values);
-                renderSeguimientoTable();
-                
-                // Cargar plantillas de mensajes
-                const mensajesResponse = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/MENSAJES!A:C`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${accessToken}`
-                        }
-                    }
-                );
-                
-                const mensajesData = await mensajesResponse.json();
-                sheetData.mensajes = processMessagesData(mensajesData.values);
-                renderMensajesTable();
-                
-            } catch (error) {
-                console.error('Error cargando datos:', error);
-                alert('Error cargando datos de Google Sheets. Por favor verifica tus permisos.');
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                return JSON.parse(jsonPayload);
+            } catch (e) {
+                return null;
             }
         }
-        
-        // Procesar datos de la hoja
-        function processSheetData(values) {
-            if (!values || values.length < 2) return [];
-            
-            const headers = values[0];
-            return values.slice(1).map(row => {
-                const obj = {};
-                headers.forEach((header, index) => {
-                    obj[header] = row[index] || '';
-                });
-                return obj;
-            });
-        }
-        
-        // Procesar plantillas de mensajes
-        function processMessagesData(values) {
-            if (!values || values.length < 2) return {Casual: {}, Negocio: {}};
-            
-            const result = {Casual: {}, Negocio: {}};
-            values.slice(1).forEach(row => {
-                const dias = row[0];
-                result.Casual[dias] = row[1] || '';
-                result.Negocio[dias] = row[2] || '';
-            });
-            return result;
-        }
-        
-        // Renderizar tabla de clientes
-        function renderClientesTable() {
-            const table = document.getElementById('clientesTable');
-            const tbody = document.getElementById('clientesBody');
-            const status = document.getElementById('clientesStatus');
-            
-            tbody.innerHTML = '';
-            
-            if (sheetData.clientes.length === 0) {
-                status.innerHTML = 'No se encontraron datos de clientes';
-                return;
-            }
-            
-            sheetData.clientes.slice(0, 10).forEach(cliente => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${cliente.ID || ''}</td>
-                    <td>${cliente.Nombre || ''}</td>
-                    <td>${cliente.Telefono || ''}</td>
-                    <td>${cliente.Departamento || ''}</td>
-                    <td>${cliente.Tipo || ''}</td>
-                `;
-                
-                tbody.appendChild(row);
-            });
-            
-            table.classList.remove('hidden');
-            status.classList.add('hidden');
-        }
-        
-        // Renderizar tabla de seguimiento
-        function renderSeguimientoTable() {
-            const table = document.getElementById('seguimientoTable');
-            const tbody = document.getElementById('seguimientoBody');
-            const status = document.getElementById('seguimientoStatus');
-            
-            tbody.innerHTML = '';
-            
-            if (sheetData.seguimiento.length === 0) {
-                status.innerHTML = 'No se encontraron datos de seguimiento';
-                return;
-            }
-            
-            sheetData.seguimiento.slice(0, 10).forEach(item => {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = `
-                    <td>${item.ID || ''}</td>
-                    <td>${item.Nombre || ''}</td>
-                    <td>${item.TelefonoI || ''}</td>
-                    <td>${item.Ocasión || ''}</td>
-                    <td>${item.Días || ''}</td>
-                `;
-                
-                tbody.appendChild(row);
-            });
-            
-            table.classList.remove('hidden');
-            status.classList.add('hidden');
-        }
-        
-        // Renderizar tabla de mensajes
-        function renderMensajesTable() {
-            const table = document.getElementById('mensajesTable');
-            const tbody = document.getElementById('mensajesBody');
-            const status = document.getElementById('mensajesStatus');
-            
-            tbody.innerHTML = '';
-            
-            if (Object.keys(sheetData.mensajes.Casual).length === 0) {
-                status.innerHTML = 'No se encontraron plantillas de mensajes';
-                return;
-            }
-            
-            Object.entries(sheetData.mensajes.Casual).forEach(([dias, mensajeCasual]) => {
-                const row = document.createElement('tr');
-                const mensajeNegocio = sheetData.mensajes.Negocio[dias] || '';
-                
-                row.innerHTML = `
-                    <td>${dias}</td>
-                    <td>${mensajeCasual}</td>
-                    <td>${mensajeNegocio}</td>
-                `;
-                
-                tbody.appendChild(row);
-            });
-            
-            table.classList.remove('hidden');
-            status.classList.add('hidden');
-        }
-        
-        // Enviar mensajes ahora
-        document.getElementById('btnSendNow').addEventListener('click', () => {
-            const message = document.getElementById('mensajeInput').value.trim();
-            
-            if (!message) {
-                alert('Por favor escribe un mensaje');
-                return;
-            }
-            
-            if (sheetData.clientes.length === 0) {
-                alert('No hay clientes para enviar mensajes');
-                return;
-            }
-            
-            startSending('now', message);
-        });
-        
-        // Enviar seguimiento
-        document.getElementById('btnSendFollow').addEventListener('click', () => {
-            if (sheetData.seguimiento.length === 0) {
-                alert('No hay datos de seguimiento');
-                return;
-            }
-            
-            startSending('follow');
-        });
-        
-        // Función para iniciar el envío
-        function startSending(type, message = '') {
-            if (currentSending) {
-                alert('Ya hay un envío en progreso');
-                return;
-            }
-            
-            const dataToSend = type === 'follow' ? sheetData.seguimiento : sheetData.clientes;
-            let messages = [];
-            
-            if (type === 'follow') {
-                // Generar mensajes personalizados para seguimiento
-                messages = dataToSend.map(item => {
-                    const dias = item.Días;
-                    const ocasion = item.Ocasión;
-                    
-                    if (ocasion.includes('Casual')) {
-                        return sheetData.mensajes.Casual[dias] || 'Mensaje no configurado';
-                    } else {
-                        return sheetData.mensajes.Negocio[dias] || 'Mensaje no configurado';
-                    }
-                });
-            } else {
-                // Mensaje único para todos
-                messages = dataToSend.map(() => message);
-            }
-            
-            // Configurar progreso
-            let sentCount = 0;
-            const totalCount = dataToSend.length;
-            counter.textContent = `0/${totalCount} enviados`;
-            progressBar.style.width = '0%';
-            sendStatus.textContent = 'Preparando envío...';
-            
-            // Simular envío (en un caso real, aquí se conectaría con WhatsApp)
-            currentSending = setInterval(() => {
-                sentCount++;
-                const progress = (sentCount / totalCount) * 100;
-                progressBar.style.width = `${progress}%`;
-                counter.textContent = `${sentCount}/${totalCount} enviados`;
-                sendStatus.textContent = `Enviando mensaje ${sentCount} de ${totalCount}`;
-                
-                if (sentCount >= totalCount) {
-                    clearInterval(currentSending);
-                    currentSending = null;
-                    sendStatus.textContent = '¡Todos los mensajes han sido enviados!';
-                    progressBar.style.background = 'linear-gradient(90deg, var(--primary), var(--success))';
+
+        // 3. Verificar estado de autenticación al cargar
+        function checkAuthState() {
+            const token = localStorage.getItem('google_token');
+            if (token) {
+                const payload = parseJwt(token);
+                if (payload && payload.email) {
+                    // Mostrar la app y ocultar login
+                    loginSection.style.display = 'none';
+                    appContent.style.display = 'block';
+                    userInfo.style.display = 'flex';
+                    userEmail.textContent = payload.email;
+                    return;
                 }
-            }, 500);
+            }
+            // No autenticado: mostrar login
+            loginSection.style.display = 'block';
+            appContent.style.display = 'none';
+            userInfo.style.display = 'none';
         }
-        
-        // Inicializar la autenticación al cargar la página
-        window.onload = () => {
-            // Configurar eventos para las pestañas de envío
-            document.querySelectorAll('.tab[data-tab]').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabName = tab.getAttribute('data-tab');
-                    
-                    // Actualizar pestañas activas
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    tab.classList.add('active');
-                    
-                    // Mostrar contenido correspondiente
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(`${tabName}Content`).classList.add('active');
-                });
+
+        // 4. Cargar Google Identity Services
+        function loadGoogleIdentity() {
+            const script = document.createElement('script');
+            script.src = 'https://accounts.google.com/gsi/client';
+            script.async = true;
+            script.defer = true;
+            script.onload = initGoogleAuth;
+            script.onerror = () => {
+                extensionWarning.style.display = 'block';
+            };
+            document.head.appendChild(script);
+        }
+
+        // 5. Inicializar Google Auth
+        function initGoogleAuth() {
+            if (typeof google === 'undefined' || !google.accounts) {
+                extensionWarning.style.display = 'block';
+                return;
+            }
+
+            google.accounts.id.initialize({
+                client_id: '789346406829-cmq7673mllfrs1gobnis4ble0vb9uv2f.apps.googleusercontent.com',
+                callback: handleCredentialResponse,
+                auto_select: true
             });
-        };
+
+            google.accounts.id.renderButton(
+                googleSignIn,
+                {
+                    type: 'standard',
+                    theme: 'filled_blue',
+                    size: 'large',
+                    text: 'signin_with',
+                    shape: 'rectangular',
+                    width: 300
+                }
+            );
+
+            google.accounts.id.prompt();
+        }
+
+        // 6. Manejar la respuesta de Google
+        function handleCredentialResponse(response) {
+            try {
+                localStorage.setItem('google_token', response.credential);
+                checkAuthState(); // Actualizar la UI
+            } catch (error) {
+                console.error('Error en autenticación:', error);
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        // 7. Función de logout
+        function logout() {
+            localStorage.removeItem('google_token');
+            if (typeof google !== 'undefined' && google.accounts) {
+                google.accounts.id.disableAutoSelect();
+            }
+            checkAuthState(); // Volver a mostrar login
+        }
+
+        // 8. Enviar mensaje por WhatsApp
+        function sendWhatsAppMessage() {
+            const phone = document.getElementById('phone').value.trim();
+            const message = document.getElementById('message').value.trim();
+            
+            if (!phone || !message) {
+                alert('Por favor ingresa el número y el mensaje');
+                return;
+            }
+
+            // Formatear el mensaje para URL
+            const encodedMessage = encodeURIComponent(message);
+            const waUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
+            
+            // Abrir en una nueva pestaña
+            window.open(waUrl, '_blank');
+        }
+
+        // Inicialización
+        window.addEventListener('DOMContentLoaded', () => {
+            checkAuthState();
+            loadGoogleIdentity();
+            
+            // Event listeners
+            logoutBtn.addEventListener('click', logout);
+            document.getElementById('sendBtn').addEventListener('click', sendWhatsAppMessage);
+        });
     </script>
 </body>
 </html>
