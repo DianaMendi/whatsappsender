@@ -1,265 +1,150 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
-    <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
-    <title>WhatsApp Sender</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .logout-btn {
-            background: #f44336;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        #loginSection {
-            text-align: center;
-            padding: 40px 0;
-        }
-        #appContent {
-            display: none; /* Inicialmente oculto hasta autenticar */
-        }
-        #extension-warning {
-            display: none;
-            background: #ffebee;
-            border: 1px solid #ffcdd2;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 20px;
-        }
-        /* Estilos para la sección de envío de mensajes */
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input, textarea {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>WhatsApp Sender</h1>
-            <div class="user-info" id="userInfo" style="display: none;">
-                <span id="userEmail"></span>
-                <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
-            </div>
-        </div>
+<html>
+  <head>
+    <title>Sheets API Quickstart</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <p>Sheets API Quickstart</p>
 
-        <!-- Sección de Login -->
-        <div id="loginSection">
-            <h2>Autenticación</h2>
-            <p>Necesitas iniciar sesión con Google para continuar</p>
-            <div id="googleSignIn"></div>
-            <div id="errorMessage" style="color: red; margin: 15px 0; display: none;">
-                Error en autenticación. Intenta nuevamente.
-            </div>
-            <div id="extension-warning">
-                <strong>¡Advertencia!</strong> Parece que tienes extensiones que bloquean Google Login. 
-                Por favor intenta en modo incógnito o desactiva AdBlock/Privacy extensions.
-            </div>
-        </div>
+    <!--Add buttons to initiate auth sequence and sign out-->
+    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
+    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
 
-        <!-- Sección de la Aplicación (oculta inicialmente) -->
-        <div id="appContent">
-            <h2>Enviar mensaje por WhatsApp</h2>
-            <div class="form-group">
-                <label for="phone">Número de teléfono (con código de país):</label>
-                <input type="text" id="phone" placeholder="Ej: +51960621504">
-            </div>
-            <div class="form-group">
-                <label for="message">Mensaje:</label>
-                <textarea id="message" rows="4" placeholder="Escribe tu mensaje aquí"></textarea>
-            </div>
-            <button id="sendBtn">Enviar por WhatsApp</button>
-        </div>
+    <pre id="content" style="white-space: pre-wrap;"></pre>
 
-        <footer style="margin-top: 30px; text-align: center;">
-            <p>Sistema desarrollado para Diana Mendi © 2023<br>
-            contacto@dianamendi.com | +51 960 621 504</p>
-        </footer>
-    </div>
+    <script type="text/javascript">
+      /* exported gapiLoaded */
+      /* exported gisLoaded */
+      /* exported handleAuthClick */
+      /* exported handleSignoutClick */
 
-    <!-- Cargamos Google Identity Services de forma dinámica -->
-    <script>
-        // 1. Elementos del DOM
-        const loginSection = document.getElementById('loginSection');
-        const appContent = document.getElementById('appContent');
-        const userInfo = document.getElementById('userInfo');
-        const userEmail = document.getElementById('userEmail');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const googleSignIn = document.getElementById('googleSignIn');
-        const errorMessage = document.getElementById('errorMessage');
-        const extensionWarning = document.getElementById('extension-warning');
+      // TODO(developer): Set to client ID and API key from the Developer Console
+      const CLIENT_ID = '<YOUR_CLIENT_ID>';
+      const API_KEY = '<YOUR_API_KEY>';
 
-        // 2. Función para decodificar el token JWT
-        function parseJwt(token) {
-            try {
-                const base64Url = token.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join(''));
-                return JSON.parse(jsonPayload);
-            } catch (e) {
-                return null;
-            }
-        }
+      // Discovery doc URL for APIs used by the quickstart
+      const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
 
-        // 3. Verificar estado de autenticación al cargar
-        function checkAuthState() {
-            const token = localStorage.getItem('google_token');
-            if (token) {
-                const payload = parseJwt(token);
-                if (payload && payload.email) {
-                    // Mostrar la app y ocultar login
-                    loginSection.style.display = 'none';
-                    appContent.style.display = 'block';
-                    userInfo.style.display = 'flex';
-                    userEmail.textContent = payload.email;
-                    return;
-                }
-            }
-            // No autenticado: mostrar login
-            loginSection.style.display = 'block';
-            appContent.style.display = 'none';
-            userInfo.style.display = 'none';
-        }
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      const SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly';
 
-        // 4. Cargar Google Identity Services
-        function loadGoogleIdentity() {
-            const script = document.createElement('script');
-            script.src = 'https://accounts.google.com/gsi/client';
-            script.async = true;
-            script.defer = true;
-            script.onload = initGoogleAuth;
-            script.onerror = () => {
-                extensionWarning.style.display = 'block';
-            };
-            document.head.appendChild(script);
-        }
+      let tokenClient;
+      let gapiInited = false;
+      let gisInited = false;
 
-        // 5. Inicializar Google Auth
-        function initGoogleAuth() {
-            if (typeof google === 'undefined' || !google.accounts) {
-                extensionWarning.style.display = 'block';
-                return;
-            }
+      document.getElementById('authorize_button').style.visibility = 'hidden';
+      document.getElementById('signout_button').style.visibility = 'hidden';
 
-            google.accounts.id.initialize({
-                client_id: '789346406829-cmq7673mllfrs1gobnis4ble0vb9uv2f.apps.googleusercontent.com',
-                callback: handleCredentialResponse,
-                auto_select: true
-            });
+      /**
+       * Callback after api.js is loaded.
+       */
+      function gapiLoaded() {
+        gapi.load('client', initializeGapiClient);
+      }
 
-            google.accounts.id.renderButton(
-                googleSignIn,
-                {
-                    type: 'standard',
-                    theme: 'filled_blue',
-                    size: 'large',
-                    text: 'signin_with',
-                    shape: 'rectangular',
-                    width: 300
-                }
-            );
-
-            google.accounts.id.prompt();
-        }
-
-        // 6. Manejar la respuesta de Google
-        function handleCredentialResponse(response) {
-            try {
-                localStorage.setItem('google_token', response.credential);
-                checkAuthState(); // Actualizar la UI
-            } catch (error) {
-                console.error('Error en autenticación:', error);
-                errorMessage.style.display = 'block';
-            }
-        }
-
-        // 7. Función de logout
-        function logout() {
-            localStorage.removeItem('google_token');
-            if (typeof google !== 'undefined' && google.accounts) {
-                google.accounts.id.disableAutoSelect();
-            }
-            checkAuthState(); // Volver a mostrar login
-        }
-
-        // 8. Enviar mensaje por WhatsApp
-        function sendWhatsAppMessage() {
-            const phone = document.getElementById('phone').value.trim();
-            const message = document.getElementById('message').value.trim();
-            
-            if (!phone || !message) {
-                alert('Por favor ingresa el número y el mensaje');
-                return;
-            }
-
-            // Formatear el mensaje para URL
-            const encodedMessage = encodeURIComponent(message);
-            const waUrl = `https://wa.me/${phone}?text=${encodedMessage}`;
-            
-            // Abrir en una nueva pestaña
-            window.open(waUrl, '_blank');
-        }
-
-        // Inicialización
-        window.addEventListener('DOMContentLoaded', () => {
-            checkAuthState();
-            loadGoogleIdentity();
-            
-            // Event listeners
-            logoutBtn.addEventListener('click', logout);
-            document.getElementById('sendBtn').addEventListener('click', sendWhatsAppMessage);
+      /**
+       * Callback after the API client is loaded. Loads the
+       * discovery doc to initialize the API.
+       */
+      async function initializeGapiClient() {
+        await gapi.client.init({
+          apiKey: API_KEY,
+          discoveryDocs: [DISCOVERY_DOC],
         });
+        gapiInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Callback after Google Identity Services are loaded.
+       */
+      function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          callback: '', // defined later
+        });
+        gisInited = true;
+        maybeEnableButtons();
+      }
+
+      /**
+       * Enables user interaction after all libraries are loaded.
+       */
+      function maybeEnableButtons() {
+        if (gapiInited && gisInited) {
+          document.getElementById('authorize_button').style.visibility = 'visible';
+        }
+      }
+
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick() {
+        tokenClient.callback = async (resp) => {
+          if (resp.error !== undefined) {
+            throw (resp);
+          }
+          document.getElementById('signout_button').style.visibility = 'visible';
+          document.getElementById('authorize_button').innerText = 'Refresh';
+          await listMajors();
+        };
+
+        if (gapi.client.getToken() === null) {
+          // Prompt the user to select a Google Account and ask for consent to share their data
+          // when establishing a new session.
+          tokenClient.requestAccessToken({prompt: 'consent'});
+        } else {
+          // Skip display of account chooser and consent dialog for an existing session.
+          tokenClient.requestAccessToken({prompt: ''});
+        }
+      }
+
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick() {
+        const token = gapi.client.getToken();
+        if (token !== null) {
+          google.accounts.oauth2.revoke(token.access_token);
+          gapi.client.setToken('');
+          document.getElementById('content').innerText = '';
+          document.getElementById('authorize_button').innerText = 'Authorize';
+          document.getElementById('signout_button').style.visibility = 'hidden';
+        }
+      }
+
+      /**
+       * Print the names and majors of students in a sample spreadsheet:
+       * https://docs.google.com/spreadsheets/d/1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms/edit
+       */
+      async function listMajors() {
+        let response;
+        try {
+          // Fetch first 10 files
+          response = await gapi.client.sheets.spreadsheets.values.get({
+            spreadsheetId: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms',
+            range: 'Class Data!A2:E',
+          });
+        } catch (err) {
+          document.getElementById('content').innerText = err.message;
+          return;
+        }
+        const range = response.result;
+        if (!range || !range.values || range.values.length == 0) {
+          document.getElementById('content').innerText = 'No values found.';
+          return;
+        }
+        // Flatten to string to display
+        const output = range.values.reduce(
+            (str, row) => `${str}${row[0]}, ${row[4]}\n`,
+            'Name, Major:\n');
+        document.getElementById('content').innerText = output;
+      }
     </script>
-</body>
+    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
+    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
+  </body>
 </html>
